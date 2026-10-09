@@ -58,7 +58,7 @@ cd Hybrid-Recommendation-Engine
 ```bash
 # On Windows
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
 # On Unix / macOS
