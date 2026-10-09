@@ -6,7 +6,7 @@ We engineered a **hybrid recommendation system** prioritizing cold-start resilie
 
 ### Models
 - **Collaborative Filtering (CF)**: Matrix Factorization via Funk SVD (`scikit-surprise`). It builds dense user and item embeddings based on historical interactions. High capacity but fails entirely on cold items/users.
-- **Content-Based Filtering (CB)**: TF-IDF vectorization over an engineered textual field comprising the item's `title`, `year`, `genres`, and `tags`. A user's profile is constructed by computing the weighted average cosine similarity across items they have interacted with, strictly filtering for **positive preferences (rating $\ge$ 3.0)**. Items rated below 3.0 are discarded and do not influence the content profile. This fallback is extremely robust to cold-start scenarios, relying purely on intrinsic item metadata.
+- **Content-Based Filtering (CB)**: TF-IDF vectorization over an engineered textual field comprising the item's `title`, `year`, and `genres` (since `tags` are unavailable in the ML-1M dataset). A user's profile is constructed by computing the weighted average cosine similarity across items they have interacted with, strictly filtering for **positive preferences (rating $\ge$ 3.0)**. Items rated below 3.0 are discarded and do not influence the content profile. This fallback is extremely robust to cold-start scenarios, relying purely on intrinsic item metadata.
 
 ### Adaptive Sigmoid Blending
 Instead of a static mix, we implemented a sigmoid-based weighting function $\alpha(u)$:
@@ -47,7 +47,7 @@ As measured, the Hybrid model (NDCG@10 = 0.1602) currently underperforms the nai
 
 ### Automated Failure Categorizations (`reports/failure_analysis_details.md`)
 We instituted an evidence-backed categorization pipeline to flag and diagnose users achieving NDCG@10 = 0:
-1. **Metadata Poverty**: Confirmed when the missing relevant items have extremely sparse or hyper-generic tags (e.g., an average of $\le 1.5$ genres). 
+1. **Metadata Poverty**: Confirmed when the missing relevant items have extremely sparse or hyper-generic genres (e.g., an average of $\le 1.5$ genres). 
 2. **Popularity Bias**: Confirmed when the median popularity of the top 10 recommended items falls into the top 10% of the most frequently interacted items globally.
 3. **Sparse History**: The user's interaction count was explicitly too low to establish a clear pattern.
 4. **Other**: Taste drifts, anomalous behavior, or complex feature interactions where the model simply misses the mark despite adequate metadata and interaction density.
