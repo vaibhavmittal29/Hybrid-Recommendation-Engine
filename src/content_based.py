@@ -14,16 +14,16 @@ class ContentBasedRecommender:
         self.train_df = train_df
 
         # Combine text features
-        movies_df["genres_str"] = movies_df["genres"].str.replace("|", " ")
+        movies_df["genres_str"] = movies_df["genres"].str.replace("|", " ").fillna("")
         movies_df["content_text"] = (
-            movies_df["title"]
+            movies_df["title"].fillna("")
             + " "
-            + movies_df["year"].astype(str)
+            + movies_df["year"].fillna("").astype(str)
             + " "
-            + movies_df["genres_str"]
+            + movies_df["genres_str"].fillna("")
             + " "
-            + movies_df["tags"]
-        )
+            + movies_df["tags"].fillna("")
+        ).fillna("")
 
         item_text = [""] * num_items
         for _, row in movies_df.iterrows():

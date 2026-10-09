@@ -1,4 +1,9 @@
 --- ALL USERS ---
+Model: Hybrid
+Eligible Users: 5956
+Avg Relevant Items per User: 17.32
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
 Precision@5: 0.1545
 Precision@10: 0.1383
 Precision@20: 0.1197
@@ -10,6 +15,11 @@ NDCG@10: 0.1602
 NDCG@20: 0.1672
 
 --- WARM USERS ---
+Model: Hybrid
+Eligible Users: 5362
+Avg Relevant Items per User: 17.43
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
 Precision@5: 0.1646
 Precision@10: 0.1472
 Precision@20: 0.1277
@@ -21,6 +31,11 @@ NDCG@10: 0.1701
 NDCG@20: 0.1777
 
 --- COLD-START USERS ---
+Model: Hybrid
+Eligible Users: 594
+Avg Relevant Items per User: 16.28
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
 Precision@5: 0.0586
 Precision@10: 0.0584
 Precision@20: 0.0549
@@ -32,6 +47,11 @@ NDCG@10: 0.0646
 NDCG@20: 0.0752
 
 --- WARM ITEMS ---
+Model: Hybrid
+Eligible Users: 5955
+Avg Relevant Items per User: 17.29
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
 Precision@5: 0.1444
 Precision@10: 0.1305
 Precision@20: 0.1128
@@ -43,6 +63,11 @@ NDCG@10: 0.1499
 NDCG@20: 0.1566
 
 --- COLD ITEMS ---
+Model: Hybrid
+Eligible Users: 135
+Avg Relevant Items per User: 1.31
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
 Precision@5: 0.0089
 Precision@10: 0.0059
 Precision@20: 0.0048
@@ -54,6 +79,11 @@ NDCG@10: 0.0239
 NDCG@20: 0.0334
 
 --- POPULARITY BASELINE ---
+Model: Popularity Baseline
+Eligible Users: 5956
+Avg Relevant Items per User: 17.32
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
 Precision@5: 0.2616
 Precision@10: 0.2348
 Precision@20: 0.2003
@@ -63,3 +93,52 @@ Recall@20: 0.2864
 NDCG@5: 0.2734
 NDCG@10: 0.2740
 NDCG@20: 0.2911
+
+--- MMR RERANKER (HYBRID) ---
+Model: Hybrid + MMR
+Eligible Users: 5956
+Avg Relevant Items per User: 17.32
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
+Precision@5: 0.1332
+Precision@10: 0.1157
+Precision@20: 0.1000
+Recall@5: 0.0441
+Recall@10: 0.0746
+Recall@20: 0.1244
+NDCG@5: 0.1462
+NDCG@10: 0.1389
+NDCG@20: 0.1428
+
+--- ABLATION: CF ONLY (ALL USERS) ---
+Model: Collaborative Filtering
+Eligible Users: 5956
+Avg Relevant Items per User: 17.32
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
+Precision@5: 0.1583
+Precision@10: 0.1417
+Precision@20: 0.1227
+Recall@5: 0.0531
+Recall@10: 0.0932
+Recall@20: 0.1551
+NDCG@5: 0.1676
+NDCG@10: 0.1639
+NDCG@20: 0.1712
+
+--- ABLATION: CB ONLY (ALL USERS) ---
+Model: Content-Based Filtering
+Eligible Users: 5956
+Avg Relevant Items per User: 17.32
+Candidate Settings: 500 sampled negatives (Seed: 42)
+Relevance Threshold: Rating >= 4.0
+Precision@5: 0.0943
+Precision@10: 0.0906
+Precision@20: 0.0838
+Recall@5: 0.0527
+Recall@10: 0.0956
+Recall@20: 0.1631
+NDCG@5: 0.0999
+NDCG@10: 0.1117
+NDCG@20: 0.1338
+

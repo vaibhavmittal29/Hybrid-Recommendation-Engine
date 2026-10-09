@@ -87,7 +87,11 @@ class Evaluator:
                 continue
 
             # Predict
-            scores, _, _, _ = self.recommender.predict_batch_users(u, candidates)
+            preds = self.recommender.predict_batch_users(u, candidates)
+            if isinstance(preds, tuple):
+                scores = preds[0]
+            else:
+                scores = preds
 
             if self.reranker is not None:
                 # Need enough candidates for top K
