@@ -1,14 +1,16 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+import pickle
+import warnings
+warnings.filterwarnings("ignore")
+
 from src.content_based import ContentBasedRecommender
 from src.collaborative_filtering import CollaborativeFilteringSVD
 from src.preprocessing import Preprocessor
 from src.data_loader import DataLoader
 from src.config import MODELS_DIR
-import os
-import sys
-import pickle
-import warnings
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 warnings.filterwarnings("ignore")
 
 

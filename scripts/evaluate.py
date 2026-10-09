@@ -1,16 +1,18 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+import pickle
+import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
+
 from src.failure_analysis import FailureAnalyzer
 from src.reranker import MMRReranker
 from src.baseline import PopularityBaseline
 from src.evaluation import Evaluator
 from src.hybrid_recommender import HybridRecommender
 from src.config import MODELS_DIR, REPORTS_DIR
-import os
-import sys
-import pickle
-import pandas as pd
-import warnings
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 warnings.filterwarnings("ignore")
 
 
@@ -65,13 +67,30 @@ def main():
     if cold_metrics:
         for m, val in cold_metrics.items():
             print(f"{m}: {val:.4f}")
+            
+    # Calculate item counts using training split only
+    item_counts = train_df["item_idx"].value_counts().to_dict()
+    cold_items = set([i for i in range(num_items) if item_counts.get(i, 0) < 5])
+    warm_items = set([i for i in range(num_items) if item_counts.get(i, 0) >= 5])
+    
+    print("\n--- 4. Evaluating COLD ITEMS (Hybrid) ---")
+    cold_item_metrics = eval_hybrid.evaluate_slice(sample_users, item_slice=cold_items)
+    if cold_item_metrics:
+        for m, val in cold_item_metrics.items():
+            print(f"{m}: {val:.4f}")
 
-    print("\n--- 4. Evaluating Popularity Baseline (Bonus) ---")
+    print("\n--- 5. Evaluating WARM ITEMS (Hybrid) ---")
+    warm_item_metrics = eval_hybrid.evaluate_slice(sample_users, item_slice=warm_items)
+    if warm_item_metrics:
+        for m, val in warm_item_metrics.items():
+            print(f"{m}: {val:.4f}")
+
+    print("\n--- 6. Evaluating Popularity Baseline (Bonus) ---")
     pop_metrics = eval_pop.evaluate_users(sample_users)
     for m, val in pop_metrics.items():
         print(f"{m}: {val:.4f}")
 
-    print("\n--- 5. Evaluating MMR Reranker (Bonus) ---")
+    print("\n--- 7. Evaluating MMR Reranker (Bonus) ---")
     mmr_metrics = eval_mmr.evaluate_users(sample_users)
     for m, val in mmr_metrics.items():
         print(f"{m}: {val:.4f}")
@@ -87,6 +106,26 @@ def main():
         f.write("--- ALL USERS ---\n")
         for m, val in all_metrics.items():
             f.write(f"{m}: {val:.4f}\n")
+
+        f.write("\n--- WARM USERS ---\n")
+        if warm_metrics:
+            for m, val in warm_metrics.items():
+                f.write(f"{m}: {val:.4f}\n")
+                
+        f.write("\n--- COLD-START USERS ---\n")
+        if cold_metrics:
+            for m, val in cold_metrics.items():
+                f.write(f"{m}: {val:.4f}\n")
+                
+        f.write("\n--- WARM ITEMS ---\n")
+        if warm_item_metrics:
+            for m, val in warm_item_metrics.items():
+                f.write(f"{m}: {val:.4f}\n")
+                
+        f.write("\n--- COLD ITEMS ---\n")
+        if cold_item_metrics:
+            for m, val in cold_item_metrics.items():
+                f.write(f"{m}: {val:.4f}\n")
 
         f.write("\n--- POPULARITY BASELINE ---\n")
         for m, val in pop_metrics.items():

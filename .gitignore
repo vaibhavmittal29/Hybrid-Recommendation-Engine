@@ -5,8 +5,6 @@ __pycache__/
 data/ml-1m/
 data/ml-1m.zip
 models/*.pkl
-reports/metrics.txt
-reports/failure_analysis_details.md
 .ipynb_checkpoints/
 .venv/
 env/

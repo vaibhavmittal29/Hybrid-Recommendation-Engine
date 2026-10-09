@@ -45,11 +45,13 @@ class ContentBasedRecommender:
         # If we just do: Score = sum(r * cos) / sum(r). We can do that
         # dynamically in predict.
 
-        # To optimize, we store the historical items and ratings per user.
+        # To optimize, we store the historical positive items and ratings per user.
         self.user_history = {}
         for u, group in train_df.groupby("user_idx"):
-            items = group["item_idx"].values
-            ratings = group["rating"].values
+            # Filter to positively rated items only
+            pos_mask = group["rating"] >= 3.0
+            items = group.loc[pos_mask, "item_idx"].values
+            ratings = group.loc[pos_mask, "rating"].values
             self.user_history[int(u)] = (items, ratings)
 
     def predict_batch_users(self, user_idx, all_items):
@@ -59,6 +61,7 @@ class ContentBasedRecommender:
         hist_items, hist_ratings = self.user_history[user_idx]
 
         if len(hist_items) == 0:
+            # If user has no positive ratings, content-based score is 0
             return np.zeros(len(all_items))
 
         hist_vectors = self.tfidf_matrix[hist_items]

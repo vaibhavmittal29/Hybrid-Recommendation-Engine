@@ -1,14 +1,16 @@
-from src.reranker import MMRReranker
-from src.hybrid_recommender import HybridRecommender
-from src.config import MODELS_DIR
 import os
 import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import pickle
 import pandas as pd
 import numpy as np
 import warnings
+warnings.filterwarnings("ignore")
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from src.reranker import MMRReranker
+from src.hybrid_recommender import HybridRecommender
+from src.config import MODELS_DIR
 warnings.filterwarnings("ignore")
 
 

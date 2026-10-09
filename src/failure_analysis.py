@@ -35,6 +35,10 @@ class FailureAnalyzer:
                     }
                 )
 
+        # Calculate item popularities for Popularity Bias check
+        item_counts = self.train_df["item_idx"].value_counts()
+        pop_threshold = item_counts.quantile(0.90)  # Top 10% most popular items
+
         # Categorize
         categories = {
             "sparse_history": 0,
@@ -43,36 +47,59 @@ class FailureAnalyzer:
             "other": 0,
         }
 
-        with open(report_path, "w") as f:
+        with open(report_path, "w", encoding='utf-8') as f:
             f.write("# Failure Analysis Details\n\n")
             f.write(f"Total failures (NDCG@10 = 0): {len(failures)}\n\n")
 
-            for fail in failures[:20]:  # Report up to 20 detailed examples
+            for fail in failures: 
                 u = fail["user"]
                 h_len = fail["history_len"]
-                f.write(f"### User {u} (History Length: {h_len})\n")
+                top_items = fail["top_items"]
+                relevant = fail["relevant"]
+                
+                # Check Popularity Bias: if most recommended items are highly popular
+                rec_pops = [item_counts.get(i, 0) for i in top_items]
+                is_pop_bias = np.median(rec_pops) > pop_threshold
+                
+                # Check Metadata Poverty: if relevant items have very few genres (generic)
+                rel_genres_count = []
+                for i in relevant:
+                    genres = self.movies_df[self.movies_df["item_idx"] == i]["genres"].values
+                    if len(genres) > 0:
+                        rel_genres_count.append(len(genres[0].split("|")))
+                
+                is_meta_poverty = len(rel_genres_count) > 0 and np.mean(rel_genres_count) <= 1.5
 
                 if h_len < 5:
                     cat = "sparse_history"
+                elif is_pop_bias:
+                    cat = "popularity_bias"
+                elif is_meta_poverty:
+                    cat = "metadata_poverty"
                 else:
                     cat = "other"
+                
                 categories[cat] += 1
+                
+                # Only write out details for the first 20 to avoid huge files
+                if categories[cat] <= 5 or sum(categories.values()) <= 20:
+                    f.write(f"### User {u} (History Length: {h_len})\n")
+                    f.write(f"**Category:** {cat}\n")
+                    f.write("**Relevant Items (Missed):**\n")
+                    for item in list(relevant)[:5]:
+                        movie_row = self.movies_df[self.movies_df["item_idx"] == item]
+                        if not movie_row.empty:
+                            title = movie_row["title"].values[0]
+                            genres = movie_row["genres"].values[0]
+                            f.write(f"- {title} [{genres}]\n")
 
-                f.write(f"**Category:** {cat}\n")
-                f.write("**Relevant Items (Missed):**\n")
-                for item in list(fail["relevant"])[:5]:
-                    title = self.movies_df[self.movies_df["item_idx"] == item][
-                        "title"
-                    ].values[0]
-                    f.write(f"- {title}\n")
-
-                f.write("**Top 5 Recommended:**\n")
-                for item in list(fail["top_items"])[:5]:
-                    title = self.movies_df[self.movies_df["item_idx"] == item][
-                        "title"
-                    ].values[0]
-                    f.write(f"- {title}\n")
-                f.write("\n---\n\n")
+                    f.write("**Top 5 Recommended:**\n")
+                    for item in list(top_items)[:5]:
+                        movie_row = self.movies_df[self.movies_df["item_idx"] == item]
+                        if not movie_row.empty:
+                            title = movie_row["title"].values[0]
+                            f.write(f"- {title} (Pop: {item_counts.get(item, 0)})\n")
+                    f.write("\n---\n\n")
 
             f.write("## Summary of Categories\n")
             for k, v in categories.items():
